@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ko" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT 1 :: Cloud & Quant 통합 개발 포털</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            aws: {
+              50: '#fef8ee',
+              100: '#fdedd4',
+              500: '#ff9900',
+              600: '#ea8600',
+              700: '#c56c00',
+              900: '#232f3e',
+            },
+            quant: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Pretendard', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+    .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+  </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col transition-colors duration-200">
+
+  <!-- 상단 네비게이션 헤더 -->
+  <header class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- 로고 및 프로젝트 타이틀 -->
+      <div class="flex items-center space-x-3 shrink-0">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-emerald-500 flex items-center justify-center text-white shadow-md font-black text-lg">
+          P1
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Project3 Portal</h1>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 badge-pulse"></span>
+              2 Repos Integrated
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-mono truncate max-w-xs sm:max-w-md">aromaglob/project3</p>
+        </div>
+      </div>
+
+      <!-- 뷰 모드 전환 버튼 (2열 / 좌측만 / 우측만) -->
+      <div class="hidden md:flex items-center p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700/60">
+        <button id="btn-dual" onclick="setViewMode('dual')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm font-semibold">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+          2열 분할 보기
+        </button>
+        <button id="btn-left" onclick="setViewMode('left')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white">
+          <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+          좌측 (AWS EC2 ALB Lab)
+        </button>
+        <button id="btn-right" onclick="setViewMode('right')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white">
+          <svg class="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+          우측 (Investment Analysis)
+        </button>
+      </div>
+
+      <!-- 다크모드 및 바로가기 -->
+      <div class="flex items-center gap-2">
+        <!-- 검색 입력창 -->
+        <div class="relative hidden sm:block w-48 lg:w-60">
+          <input type="text" id="filter-input" onkeyup="filterContent()" placeholder="기능 / 모듈 검색..." 
+            class="w-full pl-8 pr-3 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 dark:text-slate-200 placeholder-slate-400">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <!-- 다크모드 토글 버튼 -->
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="화면 모드 전환">
+          <svg id="theme-icon-dark" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          <svg id="theme-icon-light" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+
+        <!-- 원격 GitHub 링크 -->
+        <a href="https://github.com/aromaglob/project1" target="_blank" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition" title="GitHub 원격 저장소 열기">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 2열 그리드 컨테이너 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <div id="grid-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6 transition-all duration-300">
+
+      <!-- ========================================== -->
+      <!-- [좌측 카테고리] AWS EC2 ALB Lab             -->
+      <!-- ========================================== -->
+      <section id="col-left" class="flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        
+        <!-- 좌측 헤더 배너 -->
+        <div class="p-6 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent border-b border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-md shadow-amber-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+              </div>
+              <div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wide uppercase bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+                  Left Category • Cloud DevOps
+                </span>
+                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">AWS EC2 ALB Lab</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">edumgt/aws-ec2-alb-lab</p>
+              </div>
+            </div>
+            <a href="./aws-ec2-alb-lab/README.md" target="_blank" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/80 hover:bg-slate-50 font-medium text-slate-700 dark:text-slate-200 flex items-center gap-1 transition">
+              <span>README 보기</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+          <p class="mt-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            클라우드 거버넌스, 온프레미스 vs 클라우드 아키텍처 비교, AWS Application Load Balancer(ALB), EC2 Target Group, ECS Fargate, FastAPI 백엔드 및 주식 크롤러가 결합된 실습 환경입니다.
+          </p>
+        </div>
+
+        <!-- 좌측 핵심 모듈 뱃지 리스트 -->
+        <div class="px-6 py-3 bg-slate-50/50 dark:bg-slate-800/40 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-wrap gap-1.5 text-xs">
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">BE-fastapi</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">ag-grid-app</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">ohlcv-crawler</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">ECS/EC2/LB</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">FinOps/IAM</span>
+        </div>
+
+        <!-- 좌측 컨텐츠 카드 본문 -->
+        <div class="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+
+          <!-- 1. 아키텍처 플로우 시각화 -->
+          <div class="search-target bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200/60 dark:border-slate-700/60">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+              클라우드 인프라 아키텍처 흐름
+            </h3>
+            <div class="grid grid-cols-4 gap-2 text-center text-xs">
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
+                <span class="block font-bold text-slate-900 dark:text-white">Route 53</span>
+                <span class="text-[10px] text-slate-400">도메인/DNS</span>
+              </div>
+              <div class="p-2.5 bg-amber-50 dark:bg-amber-950/40 rounded-lg border border-amber-300 dark:border-amber-800/60 shadow-xs">
+                <span class="block font-bold text-amber-700 dark:text-amber-300">ALB</span>
+                <span class="text-[10px] text-amber-600/80 dark:text-amber-400/80">부하 분산</span>
+              </div>
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
+                <span class="block font-bold text-slate-900 dark:text-white">EC2 / ECS</span>
+                <span class="text-[10px] text-slate-400">FastAPI API</span>
+              </div>
+              <div class="p-2.5 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 shadow-xs">
+                <span class="block font-bold text-slate-900 dark:text-white">S3 + Grid</span>
+                <span class="text-[10px] text-slate-400">정적 호스팅</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 주요 서브 디렉토리 & 모듈 -->
+          <div class="search-target space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              핵심 디렉토리 & 역할
+            </h3>
+            <div class="space-y-2 text-xs">
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200/60 dark:border-slate-800 flex items-start gap-3">
+                <span class="p-1.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-mono font-bold shrink-0">BE-fastapi</span>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">주식 데이터 API 백엔드</div>
+                  <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">FastAPI 기반의 OHLCV 시세 제공 API, CORS 설정 및 헬스체크 엔드포인트 포함.</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200/60 dark:border-slate-800 flex items-start gap-3">
+                <span class="p-1.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-mono font-bold shrink-0">ag-grid-app</span>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">고성능 금융 데이터 프론트엔드</div>
+                  <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">AG Grid를 활용한 실시간 주식 데이터 렌더링, 필터링, 차트 연동 웹 애플리케이션.</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200/60 dark:border-slate-800 flex items-start gap-3">
+                <span class="p-1.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-mono font-bold shrink-0">ohlcv-crawler</span>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">시세 데이터 수집 크롤러</div>
+                  <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">일봉, 주봉, 분봉 시세를 수집하여 DB/S3에 저장하는 비동기 데이터 파이프라인.</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200/60 dark:border-slate-800 flex items-start gap-3">
+                <span class="p-1.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300 font-mono font-bold shrink-0">EC2/LB/ECS</span>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200">인프라 구축 & 거버넌스 스크립트</div>
+                  <p class="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">ALB 타겟 그룹 등록, ECS 태스크 정의, IAM 최소권한 정책 및 ECR 배포 스크립트 모음.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. 빠른 실행 명령어 (원클릭 복사) -->
+          <div class="search-target space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>빠른 실행 명령어</span>
+              <span class="text-[10px] text-slate-400 font-normal">터미널 복사 지원</span>
+            </h3>
+            
+            <div class="space-y-1.5">
+              <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-xs flex items-center justify-between group">
+                <span class="truncate">cd aws-ec2-alb-lab/BE-fastapi && uvicorn main:app --reload</span>
+                <button onclick="copyText('cd aws-ec2-alb-lab/BE-fastapi && uvicorn main:app --reload', this)" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition" title="복사">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+              </div>
+
+              <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-xs flex items-center justify-between group">
+                <span class="truncate">docker-compose -f aws-ec2-alb-lab/compose/docker-compose.yml up -d</span>
+                <button onclick="copyText('docker-compose -f aws-ec2-alb-lab/compose/docker-compose.yml up -d', this)" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition" title="복사">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 로컬 바로가기 링크 버튼들 -->
+          <div class="pt-2 flex flex-wrap gap-2 text-xs">
+            <a href="./aws-ec2-alb-lab/README.md" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-semibold transition flex items-center gap-1">
+              <span>인프라 가이드 전문</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            <a href="./aws-ec2-alb-lab/index.html" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition flex items-center gap-1">
+              <span>S3 웹사이트 데모</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ========================================== -->
+      <!-- [우측 카테고리] Investment Analysis          -->
+      <!-- ========================================== -->
+      <section id="col-right" class="flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm overflow-hidden transition-all">
+        
+        <!-- 우측 헤더 배너 -->
+        <div class="p-6 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border-b border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+              </div>
+              <div>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold tracking-wide uppercase bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                  Right Category • Quant & Trading
+                </span>
+                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">Investment Analysis</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">edumgt/investment-analysis</p>
+              </div>
+            </div>
+            <a href="./investment-analysis/readme.md" target="_blank" class="text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/80 hover:bg-slate-50 font-medium text-slate-700 dark:text-slate-200 flex items-center gap-1 transition">
+              <span>README 보기</span>
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+          <p class="mt-3 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            QuantConnect Lean 기반 알고리즘 트레이딩 백테스트, 기업 가치평가(DCF, RIM), 재무제표 분석, 그리고 Qdrant RAG + Ollama AI 및 MongoDB 퀴즈 시스템을 탑재한 종합 퀀트 플랫폼입니다.
+          </p>
+        </div>
+
+        <!-- 우측 핵심 모듈 뱃지 리스트 -->
+        <div class="px-6 py-3 bg-slate-50/50 dark:bg-slate-800/40 border-b border-slate-200/60 dark:border-slate-800/60 flex flex-wrap gap-1.5 text-xs">
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">QuantConnect Lean</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">FastAPI Backend</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">Qdrant Vector DB</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">MongoDB Quiz</span>
+          <span class="px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-mono">Ollama RAG</span>
+        </div>
+
+        <!-- 우측 컨텐츠 카드 본문 -->
+        <div class="p-6 space-y-6 flex-1 overflow-y-auto custom-scrollbar">
+
+          <!-- 1. 백테스트 성과 요약 위젯 -->
+          <div class="search-target bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 border border-slate-200/60 dark:border-slate-700/60">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-3 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+              주요 종목 알고리즘 백테스트 결과
+            </h3>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-slate-900 dark:text-white">현대자동차 (005380)</span>
+                  <span class="px-1.5 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-bold">Lean 전략</span>
+                </div>
+                <div class="mt-2 text-slate-500 dark:text-slate-400 text-[11px] space-y-0.5">
+                  <p>• 경로: <code class="font-mono text-slate-700 dark:text-slate-300">hyundai-results/</code></p>
+                  <p>• 이동평균 모멘텀 & 자산배분 성과 기록</p>
+                </div>
+              </div>
+
+              <div class="p-3 bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-slate-900 dark:text-white">삼성전기 (009150)</span>
+                  <span class="px-1.5 py-0.5 text-[10px] rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 font-bold">Lean 전략</span>
+                </div>
+                <div class="mt-2 text-slate-500 dark:text-slate-400 text-[11px] space-y-0.5">
+                  <p>• 경로: <code class="font-mono text-slate-700 dark:text-slate-300">samsung-em-results/</code></p>
+                  <p>• 변동성 돌파 및 볼린저 밴드 오실레이터</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. 주식 퀴즈 인터랙티브 맛보기 -->
+          <div class="search-target bg-emerald-500/5 rounded-xl p-4 border border-emerald-500/20">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                학습 퀴즈 체험 (Day 5 - 리밸런싱)
+              </span>
+              <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">quiz_questions.json 연동</span>
+            </div>
+            <p id="quiz-question" class="text-xs font-semibold text-slate-800 dark:text-slate-100">
+              리밸런싱(Rebalancing)의 설명으로 가장 적절한 것은?
+            </p>
+            <div id="quiz-options" class="mt-2.5 space-y-1.5 text-xs">
+              <button onclick="checkQuiz(0, false)" class="quiz-btn w-full text-left p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition text-slate-700 dark:text-slate-300">
+                1) 매일 모든 자산을 사고파는 것
+              </button>
+              <button onclick="checkQuiz(1, false)" class="quiz-btn w-full text-left p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition text-slate-700 dark:text-slate-300">
+                2) 주식 시장의 단기 가격을 정확히 맞히는 기술
+              </button>
+              <button onclick="checkQuiz(2, true)" class="quiz-btn w-full text-left p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition text-slate-700 dark:text-slate-300">
+                3) 정한 자산 비중에서 크게 벗어났을 때 원래 계획에 가깝게 비중을 재조정하는 것
+              </button>
+            </div>
+            <div id="quiz-feedback" class="mt-2 text-xs hidden p-2 rounded-lg font-medium"></div>
+          </div>
+
+          <!-- 3. 빠른 실행 명령어 (원클릭 복사) -->
+          <div class="search-target space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center justify-between">
+              <span>빠른 실행 명령어 (Docker & Python)</span>
+              <span class="text-[10px] text-slate-400 font-normal">터미널 복사 지원</span>
+            </h3>
+            
+            <div class="space-y-1.5">
+              <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-xs flex items-center justify-between group">
+                <span class="truncate">docker compose -f investment-analysis/docker-compose.yml up -d mongo qdrant</span>
+                <button onclick="copyText('docker compose -f investment-analysis/docker-compose.yml up -d mongo qdrant', this)" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition" title="복사">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+              </div>
+
+              <div class="bg-slate-900 text-slate-200 p-2.5 rounded-lg font-mono text-xs flex items-center justify-between group">
+                <span class="truncate">cd investment-analysis && uvicorn app.backend.main:app --port 8000 --reload</span>
+                <button onclick="copyText('cd investment-analysis && uvicorn app.backend.main:app --port 8000 --reload', this)" class="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition" title="복사">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. 로컬 바로가기 링크 버튼들 -->
+          <div class="pt-2 flex flex-wrap gap-2 text-xs">
+            <a href="./investment-analysis/readme.md" class="px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-semibold transition flex items-center gap-1">
+              <span>퀀트 가이드 전문</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            <a href="./investment-analysis/quiz_questions.json" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition flex items-center gap-1">
+              <span>퀴즈 원본 JSON</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- 하단 푸터 바 -->
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-xs text-slate-500 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Local Workspace: <code class="font-mono text-slate-700 dark:text-slate-300">C:\Users\Administrator\.gemini\antigravity\scratch\project3</code></span>
+      </div>
+      <div>
+        <span>Connected to <strong class="text-slate-700 dark:text-slate-200 font-semibold">aromaglob/project3</strong></span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 알림 토스트 컴포넌트 -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400 dark:text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <span id="toast-message">클립보드에 복사되었습니다!</span>
+  </div>
+
+  <script>
+    // 화면 모드 전환 (Dual / Left Only / Right Only)
+    function setViewMode(mode) {
+      const grid = document.getElementById('grid-container');
+      const colLeft = document.getElementById('col-left');
+      const colRight = document.getElementById('col-right');
+      const btnDual = document.getElementById('btn-dual');
+      const btnLeft = document.getElementById('btn-left');
+      const btnRight = document.getElementById('btn-right');
+
+      [btnDual, btnLeft, btnRight].forEach(b => {
+        b.className = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white';
+      });
+
+      if (mode === 'dual') {
+        grid.className = 'grid grid-cols-1 lg:grid-cols-2 gap-6 transition-all duration-300';
+        colLeft.classList.remove('hidden');
+        colRight.classList.remove('hidden');
+        btnDual.className = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm font-semibold';
+      } else if (mode === 'left') {
+        grid.className = 'grid grid-cols-1 gap-6 transition-all duration-300 max-w-4xl mx-auto';
+        colLeft.classList.remove('hidden');
+        colRight.classList.add('hidden');
+        btnLeft.className = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm font-semibold';
+      } else if (mode === 'right') {
+        grid.className = 'grid grid-cols-1 gap-6 transition-all duration-300 max-w-4xl mx-auto';
+        colLeft.classList.add('hidden');
+        colRight.classList.remove('hidden');
+        btnRight.className = 'px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm font-semibold';
+      }
+    }
+
+    // 텍스트 클립보드 복사 함수
+    function copyText(text, btnElement) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("명령어가 복사되었습니다: " + text.slice(0, 32) + (text.length > 32 ? "..." : ""));
+      }).catch(err => {
+        showToast("복사 완료!");
+      });
+    }
+
+    // 토스트 팝업 표시
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2500);
+    }
+
+    // 다크모드 토글 및 로컬 저장소 동기화
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 퀴즈 피드백
+    function checkQuiz(choiceIndex, isCorrect) {
+      const feedback = document.getElementById('quiz-feedback');
+      const buttons = document.querySelectorAll('.quiz-btn');
+      
+      buttons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === 2) {
+          btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-950/60', 'font-bold');
+        } else if (idx === choiceIndex && !isCorrect) {
+          btn.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-950/60');
+        }
+      });
+
+      feedback.classList.remove('hidden');
+      if (isCorrect) {
+        feedback.className = 'mt-2 text-xs p-2.5 rounded-lg bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-medium';
+        feedback.innerHTML = '🎉 <strong>정답입니다!</strong> 리밸런싱은 미래 가격을 맞히기보다 초기 자산배분 계획과 허용 리스크 수준을 복원하기 위한 핵심 관리 절차입니다.';
+      } else {
+        feedback.className = 'mt-2 text-xs p-2.5 rounded-lg bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 font-medium';
+        feedback.innerHTML = '❌ <strong>아쉽습니다!</strong> 정답은 3번입니다. 리밸런싱은 자산 가격 변동으로 달라진 비중을 원래 목표 비율로 되돌리는 작업입니다.';
+      }
+    }
+
+    // 실시간 필터 검색
+    function filterContent() {
+      const query = document.getElementById('filter-input').value.toLowerCase();
+      const targets = document.querySelectorAll('.search-target');
+      targets.forEach(target => {
+        const text = target.innerText.toLowerCase();
+        if (text.includes(query)) {
+          target.style.display = '';
+        } else {
+          target.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

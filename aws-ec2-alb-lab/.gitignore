@@ -1,0 +1,15 @@
+/venv
+.env
+__pycache__/
+*.pyc
+
+*.key
+.venv/
+
+*.pem
+aws/
+*.zip
+*.csv
+deploy/stock-platform/env.sh
+deploy/stock-platform/.state*
+.env.deploy

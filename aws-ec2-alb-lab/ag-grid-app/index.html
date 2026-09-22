@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Korea Stock OHLCV</title>
+    <meta name="description" content="국내 주식 OHLCV 조회 대시보드" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@34.1.2/dist/ag-grid-community.min.js"></script>
+  </head>
+  <body>
+    <nav class="topbar"><a class="topbar-logo" href="#">OHLCV Explorer</a><span class="topbar-divider"></span><span class="topbar-title">국내 주식 일봉 조회</span></nav>
+    <div class="shell">
+      <header class="hero">
+        <div class="hero-copy"><p class="eyebrow">✦ Korea Stock Open API</p><h1>주식 OHLCV 데이터</h1><p class="hero-text">종목명 또는 종목코드를 검색하고 기간을 선택해 시가·고가·저가·종가·거래량을 확인하세요.</p></div>
+        <div class="hero-panel">
+          <div class="metric-card"><span class="metric-label">선택 종목</span><strong id="selectedStock">-</strong></div>
+          <div class="metric-card"><span class="metric-label">조회 건수</span><strong id="resultCount">0</strong></div>
+          <div class="metric-card"><span class="metric-label">최근 종가</span><strong id="lastClose">-</strong></div>
+        </div>
+      </header>
+      <main class="workspace">
+        <section class="toolbar">
+          <form id="searchForm" class="search-form">
+            <label class="search-field" for="stockSearch"><span>종목 검색</span><input id="stockSearch" type="search" list="stockOptions" placeholder="예: 삼성전자 또는 005930" autocomplete="off" required /></label>
+            <datalist id="stockOptions"></datalist>
+            <label class="date-field" for="startDate"><span>시작일</span><input id="startDate" type="date" /></label>
+            <label class="date-field" for="endDate"><span>종료일</span><input id="endDate" type="date" /></label>
+            <button type="submit" class="primary-button">조회</button>
+            <button type="button" class="ghost-button" id="resetFilters">기간 초기화</button>
+          </form>
+          <p id="statusMessage" class="status-message" role="status" aria-live="polite">종목 목록을 불러오는 중입니다.</p>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><p class="panel-kicker">Daily price history</p><h2>OHLCV 일봉 목록</h2></div><div class="volume-summary">기간 내 거래량 <strong id="totalVolume">0</strong></div></div>
+          <div id="ohlcvGrid" class="ag-theme-quartz grid-frame"></div>
+        </section>
+      </main>
+    </div>
+    <script src="config.js"></script><script src="app.js"></script>
+  </body>
+</html>
