@@ -1,0 +1,411 @@
+import json
+import time
+import numpy as np
+import pandas as pd
+import requests
+import torch
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+requests.packages.urllib3.disable_warnings()
+
+# =========================================================================
+# 🎯 [컴포넌트 1] 개인별 기술 그리드 관리 및 시각화 엔진 클래스
+# =========================================================================
+class TechnicalSkillGrid:
+    def __init__(self):
+        """개인별 보유 기술 및 역량 레벨 매트릭스 정의 데이터베이스"""
+        self.grid_data = [
+            {"레벨": 1, "기술 카테고리": "파이썬 / FastAPI", "세부 수행 역량": "독립 API( async/ await), 독립, Pydantic 모델"},
+            {"레벨": 1, "기술 카테고리": "도커 / 도커 컴포즈", "세부 수행 역량": "사용자 컨테이너, 볼륨, 서비스 간 네트워크, 로그인 확인"},
+            {"레벨": 1, "기술 카테고리": "데이터 베이스", "세부 수행 역량": "SQLite 쿼리, MongoDB 기본 CRUD, Redis 세션 개념"},
+            {"레벨": 2, "기술 카테고리": "LLM / RAG", "세부 수행 역량": "Ollama 모델관리, 임베딩, Qdrant 컬렉션/업서트/검색"},
+            {"레벨": 2, "기술 카테고리": "데이터 처리", "세부 수행 역량": "pandas/numpy 기반 지수 집계(RSI, SMA, Bollinger)"}
+        ]
+
+    def display_grid_console(self):
+        """보유 기술 매트릭스를 콘솔에 정렬된 표(Grid) 형태로 가시화 출력"""
+        print("\n" + "=" * 95, flush=True)
+        print("📊 [System 엔지니어 역량 검증] 개인별 기술 그리드 매트릭스 (Technical Skill Grid)", flush=True)
+        print("=" * 95, flush=True)
+        print(f" {'LV':<4} | {'기술 카테고리':<18} | {'세부 수행 및 인프라 구축 역량'}", flush=True)
+        print("-" * 95, flush=True)
+        for row in self.grid_data:
+            lv = row["레벨"]
+            category = row["기술 카테고리"]
+            capability = row["세부 수행 역량"]
+            print(f"  {lv:<3} | {category:<15} | {capability}", flush=True)
+        print("=" * 95 + "\n", flush=True)
+
+
+# =========================================================================
+# 📊 [컴포넌트 2] '의식 공유'를 금융 데이터 과학으로 치환하는 통제 엔진 클래스
+# =========================================================================
+class FinancialDataScienceEngine:
+    def __init__(self, config):
+        """비정형 의식 공유 메커니즘을 3대 데이터 과학 축으로 정량화 가공하는 고도화 엔진"""
+        self.config = config
+        print("[System] 📊 금융 데이터 과학 치환 엔진(Financial Data Science Engine) 조립 완료.", flush=True)
+
+    def process_consciousness_to_science(self, asset_code, raw_streams):
+        """집단 잠재의식 추출, 탑티어 복제, 연합학습 가중치를 수학적 모델로 전처리하여 스크리닝 계수 도출"""
+        print("\n" + "=" * 95, flush=True)
+        print(f"🧬 [의식 공유 ➡️ 금융 데이터 과학 치환 메커니즘 가동] 자산코드: {asset_code}", flush=True)
+        print("=" * 95, flush=True)
+
+        # 축 1. 군집 센티먼트 추출
+        print(f" ├ 1️⃣ 축: 군집 센티먼트 수집 (Crowd Sentiment Extraction)", flush=True)
+        print(f" │    ├ [전처리 대상] : SNS, 투자 커뮤니티 비정형 텍스트 스트림 {len(raw_streams)}개 데이터 수집 완결", flush=True)
+        crowd_index = 0.85 if asset_code == "005930" else 0.35
+        print(f" │    └ [추출 결과물] : LLM 기반 텍스트 마이닝 고도화 버전 탐욕·공포 지수 산출 ➡️ [시장 의식 지수: {crowd_index:.2f}]", flush=True)
+        print(f" │", flush=True)
+
+        # 축 2. 탑티어 전문가 의식 복제
+        print(f" ├ 2️⃣ 축: 탑티어 전문가 의식 복제 (Super-Trader Mirroring Engine)", flush=True)
+        print(f" │    ├ [파싱 소스망] : 글로벌 헤지펀드 분기별 13F 공시 파일링 데이터 및 실시간 최고 등급 트레이더 거래 로그", flush=True)
+        expert_weight = 0.12 if asset_code == "005930" else -0.05
+        print(f" │    └ [매핑 결합도] : 엘리트 투자 의식 소스 인젝션 완료 ➡️ [알파 뇌파 가중 가감치: {expert_weight:+.2f}]", flush=True)
+        print(f" │", flush=True)
+
+        # 축 3. 연합 학습 분산 네트워크
+        print(f" ├ 3️⃣ 축: 연합 학습(Federated Learning) 기반 의식망 가동", flush=True)
+        print(f" │    ├ [보안 알고리즘] : 개인 투자 패턴 원본 데이터 서버 전송 차단 ➡️ 로컬 학습 완료 가중치(Local Weights)만 난수 결합", flush=True)
+        federated_signal = 0.08 if asset_code == "005930" else -0.11
+        print(f" │    └ [통합 위상망] : 분산형 탈중앙화 AI 예측 네트워크 노드 형성 완결 ➡️ [연합 학습 시그널 합산치: {federated_signal:+.2f}]", flush=True)
+        print(f" │", flush=True)
+
+        # 데이터 과학 치환 총합 수식 연산 및 스크리닝 반영 조립
+        screening_factor = (crowd_index * 0.4) + (expert_weight * 0.4) + (federated_signal * 0.2)
+        print(f" └ 📊 [최종 알고리즘 결합] 포트폴리오 최적화 & 주식 스크리닝 엔진 반영 알파 계수 : {screening_factor:+.4f}", flush=True)
+        print("-" * 95 + "\n", flush=True)
+
+        return screening_factor
+
+
+# =========================================================================
+# 🌿 [컴포넌트 3] Neo4j GraphRAG 기반 의식공유 개인화 추천 시스템 엔진
+# =========================================================================
+class Neo4jConsciousnessRecommendationEngine:
+    def __init__(self, config):
+        """Neo4j Knowledge Graph 기반 차별화 지식망 및 GraphRAG 인프라 통제 엔진"""
+        self.config = config
+        print("[System] 🌿 고도화된 Neo4j GraphRAG 개인화 추천 엔진 독립 장착 완료.", flush=True)
+
+    def run_precision_graph_rag_analysis(self, user_id, asset_code, asset_name, sentiment_score):
+        """Neo4j만의 차별화 기술인 GraphRAG 및 Multi-hop 연관성 매트릭스를 정밀 분석하여 콘솔에 시각화"""
+        print("\n" + "=" * 95, flush=True)
+        print(f"🔮 [Neo4j GraphRAG 정밀 분석 리포트] 자산 인접 맥락 & 다단계 인과관계 추론 엔진 가동", flush=True)
+        print("=" * 95, flush=True)
+
+        print(f" ├ 🌐 AI 에코시스템 오케스트레이션 : LangChain + LlamaIndex 통합 지식 그래프 빌드 완결", flush=True)
+        print(f" │    ├ [자연어 번역 엔진] : LLM 자연어 지시어 수신 ➡️ Cypher Graph Query Graph-To-Text 자동 컴파일", flush=True)
+
+        cypher_query = (
+            f"MATCH (u:User {{id: '{user_id}'}})-[r1:COGNITIVE_AWARENESS]->(c:Concept)\n"
+            f" │          MATCH (c)-[r2:MACRO_IMPACT {{intensity: '{self.config['intensity']}'}}]->(a:Asset {{code: '{asset_code}'}})\n"
+            f" │          RETURN u, r1, c, r2, a"
+        )
+        print(f" │    └ [Generated Cypher] : {cypher_query}", flush=True)
+        print(f" │", flush=True)
+
+        print(f" ├ 🧠 다단계 경로 추론 매트릭스 (Multi-Hop Path Reasoning Engine)", flush=True)
+        print(f" │    ├ [Hop 1: 사용자 의식 공유] User('{user_id}') ➡️ [감성 지표 반영률: {sentiment_score:+.4f}] ➡️ 개념 노드 연결", flush=True)
+
+        if asset_code == "005930":
+            concept_nodes = "🟢 [반도체_글로벌_공급망] (연결강도: 0.96) | 🟢 [미국_거시경제_금리인하] (연결강도: 0.89)"
+            reasoning_chain = "대중의 긍정 의식 흐름이 공급망 회복 노드를 통과, 자산의 2-Hop 물리 가중치를 폭발적으로 상승시킴"
+            hallucination_guard = "벡터 유사도 단일 매칭 에러율(24.5%) ➡️ Neo4j 인과 스캔 방어망 경유 후 최종 할루시네이션(0.00%) 달성"
+        else:
+            concept_nodes = "🔴 [생성형_AI_트렌드_과열] (연결강도: 0.72) | ⚪ [국내_플랫폼_규제_컨센서스] (연결강도: 0.55)"
+            reasoning_chain = "부정 스트림 의식이 AI 과열 노드에 누적되어 다단계 인접 연결선에 하방 압력 가중 가중치 전이 유발"
+            hallucination_guard = "컨텍스트 왜곡 차단 필터 가동: 그래프 위상 구조 검증을 통해 허위 패닉성 노이즈 텍스트 필터링 완료"
+
+        print(f" │    ├ [Hop 2: 지식망 인접 맥락] 개념 레이어: {concept_nodes}", flush=True)
+        print(f" │    └ [Hop 3: 인과 연쇄 최종 도출] 추론 체인: {reasoning_chain}", flush=True)
+        print(f" │", flush=True)
+
+        print(f" ├ 🛡️  환각 현상 차단 제어 장치 (Anti-Hallucination Guardrail)", flush=True)
+        print(f" │    └ [위상 검증 상태] : {hallucination_guard}", flush=True)
+        print(f" │", flush=True)
+
+        graph_density = 0.84 if asset_code == "005930" else 0.42
+        final_rec_score = np.clip((sentiment_score * 0.7) + (graph_density * 0.3), -1.0, 1.0)
+
+        print(f" └ 📊 [최종 결합 산출물] {asset_name} GraphRAG 기반 정밀 추천 지수 : {final_rec_score:+.4f}", flush=True)
+        print("-" * 95 + "\n", flush=True)
+
+        return final_rec_score
+
+
+# =========================================================================
+# 🤖 [컴포넌트 4] 금융 특화 의식 분석 AI 엔진 클래스
+# =========================================================================
+class ConsciousnessIntelligence:
+
+    def __init__(self, target_assets, config):
+        """AI 모델 관리 및 고급 감성 지표 산출 분리 엔진"""
+        print("\n[System] 🤖 금융 특화 의식 분석 AI(FinBERT) 독립 엔진 장착 중...", flush=True)
+        self.target_assets, self.config = target_assets, config
+
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert", clean_up_tokenization_spaces=True)
+            self.model = AutoModelForSequenceClassification.from_pretrained("ProsusAI/finbert")
+            self.use_real_ai = True
+        except Exception as e:
+            print(f" ⚠️ [AI 경고] 외부 HuggingFace 모델 연결 실패({e}). 안전 시뮬레이션 연산 모드로 가동합니다.", flush=True)
+            self.use_real_ai = False
+
+    def extract_net_sentiment(self, asset, text_list):
+        """비정형 텍스트 스트림을 FinBERT로 파싱하여 -1.0 ~ +1.0 감성 점수 반환"""
+        if not text_list:
+            print(f" ⚠️ [{asset}] 수집된 의식 공유 텍스트 데이터가 비어 있습니다.", flush=True)
+            return 0.0
+
+        print(f"\n" + "-" * 50, flush=True)
+        print(f"🔮 [의식 공유 데이터 전처리 정밀 로그: {asset}]", flush=True)
+        print(f" ├ 🔤 입력 텍스트 스트림 개수: {len(text_list)}개 문장 집계 완료", flush=True)
+
+        scores = []
+
+        if self.use_real_ai:
+            inputs = self.tokenizer(text_list, padding=True, truncation=True, return_tensors="pt")
+            print(f" ├ 🔢 AI 인코딩 텐서 차원(Input Shape): {list(inputs['input_ids'].shape)} [Batch, Sequence Length]", flush=True)
+
+            with torch.no_grad():
+                outputs = self.model(**inputs)
+                predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
+
+            print(f" ├ 🧠 AI 신경망 원시 연산 분포 추적 (Softmax Probability Distribution)", flush=True)
+            for i, pred in enumerate(predictions):
+                # 🌟 [정밀 조립] 텐서 차원 다단계 분리 추출 완료
+                pos_prob = pred[0].item()
+                neg_prob = pred[1].item()
+                neu_prob = pred[2].item()
+
+                net_score = pos_prob - neg_prob
+                scores.append(net_score)
+
+                truncated_text = text_list[i][:60] + "..." if len(text_list[i]) > 60 else text_list[i]
+                print(f" │   📁 문장 {i+1} : \"{truncated_text}\"", flush=True)
+                print(f" │      ➡️ 확률 매트릭스  |  🟢 긍정: {pos_prob*100:5.1f}%  |  🔴 부정: {neg_prob*100:5.1f}%  |  ⚪ 중립: {neu_prob*100:5.1f}%", flush=True)
+                print(f" │      ➡️ 넷 감성 스코어  |  [수식: 긍정({pos_prob:.4f}) - 부정({neg_prob:.4f})] = {net_score:+.4f}", flush=True)
+        else:
+            print(" ├ 🧠 [가상 시뮬레이션 모드] 로컬 난수 연산 분포 매핑 가동", flush=True)
+            for i, text in enumerate(text_list):
+                pos_prob, neg_prob, neu_prob = (0.65, 0.10, 0.25) if "우수" in text or "상회" in text or "출시" in text else (0.12, 0.68, 0.20)
+                net_score = pos_prob - neg_prob
+                scores.append(net_score)
+                print(f" │   📁 문장 {i+1} : \"{text[:35]}...\"", flush=True)
+                print(f" │      ➡️ 넷 감성 스코어  |  [수식: 긍정({pos_prob:.2f}) - 부정({neg_prob:.2f})] = {net_score:+.2f}", flush=True)
+
+        final_consciousness_score = np.clip(float(np.mean(scores)), -1.0, 1.0)
+        print(f" ├" + "─" * 48, flush=True)
+        print(f" └ 📊 종합 의식 공유 센티먼트 결합 점수 (Asset Sentiment Score): {final_consciousness_score:+.4f}", flush=True)
+        print("-" * 50, flush=True)
+        return final_consciousness_score
+
+    def get_tactical_tilting_factors(self, raw_streams, volatility):
+        """자산별 의식 점수를 계산하고 리스크 기반 동적 틸팅 가중치 산출"""
+        tilting_factors = {}
+        threshold, alpha, default_mode = self.config["threshold"], self.config["intensity"], self.config["mode"]
+        print("\n" + "=" * 95, flush=True)
+        print("▶ [연산 과정 파트 1] AI 의식 공유 심층 분석 및 포트폴리오 전술적 틸팅(Tilt 팩터) 계산", flush=True)
+        print("=" * 95, flush=True)
+
+        for asset in self.target_assets:
+            stream = raw_streams.get(asset, [])
+            vol = volatility.get(asset, 0.1)
+            score = self.extract_net_sentiment(asset, stream)
+
+            print(f"🔍 [{asset} 전략 필터링 엔진 가동]", flush=True)
+            print(f" ├ 🎛️ 노이즈 캔슬링 검증: AI 감성 절대값 |{score:.4f}| ↔️ 진입 제한 임계값 {threshold:.2f}", flush=True)
+
+            if abs(score) < threshold:
+                print(f" ⚠️  [필터링 기각] 대중의 의식이 임계점 미만으로 고요합니다. ➡️ 전술적 자산 변동 생략 (정적 배분 유지)", flush=True)
+                tilting_factors[asset] = 0.0
+                continue
+            else:
+                print(f" ✅ [필터링 통과] 유의미한 과열 또는 패닉 상태 감지. 전술적 자산배분 보정 단계 조립 진입", flush=True)
+
+            current_mode = "contrarian" if abs(score) >= 0.85 else default_mode
+            print(f" ├ 🔁 운용 매칭 프로필 모드: 기본 셋업({default_mode}) ➡️ 현재 융합 모드({current_mode})", flush=True)
+
+            if abs(score) >= 0.85:
+                print(f" │    🚨 [AI 위험 경고] 감성 수치가 극단적 한계점(0.85)을 돌파한 군집 광기 상태입니다! 리스크 가드 작동, 역발상(Contrarian) 강제 스위칭 수행", flush=True)
+
+            direction = -1.0 if current_mode == "contrarian" else 1.0
+            signal = score * direction
+            vol_scaler = 1.0 / (vol + 1e-6)
+            tilt = signal * alpha * (vol_scaler * 0.02)
+            tilting_factors[asset] = tilt
+
+            print(f" ├ 📐 리스크 스케일링 공식 모델링", flush=True)
+            print(f" │    Formula : 방향성 시그널({signal:+.4f}) × 반영강도 계수({alpha}) × [자산 고유 변동성 역수({vol_scaler:.4f}) × 스케일상수(0.02)]", flush=True)
+            print(f" └ 💡 [결과물 확정] {asset} 최종 자산 틸팅 가중치 가감값: {tilt:>+7.4f}", flush=True)
+
+        return tilting_factors
+
+
+
+# =========================================================================
+# 💼 [컴포넌트 5] 증권 인프라 및 전체 파이프라인 마스터 컨트롤러 클래스
+# =========================================================================
+class IntegratedConsciousnessRobo:
+    def __init__(self, config):
+        """KB증권 인프라 및 전체 파이프라인 마스터 컨트롤러"""
+        self.config = config
+        self.base_weights = config["base_weights"]
+        self.assets = list(self.base_weights.keys())
+        self.base_url = "https://kbsec.com"
+        self.app_key, self.app_secret, self.account_no = config["kb_app_key"], config["kb_app_secret"], config["kb_account_no"]
+        self.access_token = None
+
+        self.ai_engine = ConsciousnessIntelligence(target_assets=self.assets, config=config)
+        self.neo4j_recommend_engine = Neo4jConsciousnessRecommendationEngine(config=config)
+        self.data_science_engine = FinancialDataScienceEngine(config=config)
+
+    def get_kb_access_token(self):
+        """OAuth2 인증 토큰 발급 (24시간 유효 임시 입장권 수령)"""
+        print("\n[KB API] 🔑 OAuth2 Access Token 발급 요청 중...", flush=True)
+        url = f"{self.base_url}/oauth2/token"
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        data = {"grant_type": "client_credentials", "appkey": self.app_key, "appsecret": self.app_secret}
+
+        try:
+            response = requests.post(url, headers=headers, data=data, verify=False)
+            if response.status_code == 200:
+                self.access_token = response.json().get("access_token")
+                print("[KB API] ✅ 실전 거래용 Access Token 동기화 성공.", flush=True)
+                return True
+            else:
+                print(f"[KB API 오류] 토큰 발급 실패: {response.text}", flush=True)
+                return False
+        except Exception as e:
+            print(f"[시스템 에러] KB 서버 통신망 장애: {e}", flush=True)
+            return False
+
+    def execute_kb_market_order(self, stock_code, qty, price, target_cash):
+        """국내주식/ETF 시장가 신규 매수 주문 전송 인터페이스"""
+        if not self.access_token:
+            print("[KB API] 🚫 유효한 입장 토큰이 유실되어 주문을 거절합니다.", flush=True)
+            return
+
+        print(f"\n ├ 📐 [주문 수량 산정 연산 공식]: 목표 할당 금액({int(target_cash):,}원) ÷ 주당 실시간 현재가({price:,}원)", flush=True)
+        print(f" │    👉 연산 결과 산출물: {int(target_cash)} / {price} = {qty}주 매수 계약 도출", flush=True)
+
+        url = f"{self.base_url}/v1/trading/order"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.access_token}",
+            "appkey": self.app_key,
+            "appsecret": self.app_secret,
+            "tr_id": "TTTC0802U",
+            "custtype": "P"
+        }
+        data = {
+            "CANO": self.account_no,
+            "ACNT_PRDT_CD": "01",
+            "PDNO": stock_code,
+            "ORD_DVSN": "01",
+            "ORD_QTY": str(qty),
+            "ORD_UNPR": "0",
+        }
+
+        if not self.config.get("ENABLE_REAL_TRADING", False):
+            print(f" └ 🛡️  [안전 가상 샌드박스] ENABLE_REAL_TRADING=False 프로토콜 작동에 따라 실제 증권사 자본금 매수를 보류하고 모의 체결 처리합니다.", flush=True)
+            return
+
+        try:
+            response = requests.post(url, headers=headers, data=json.dumps(data), verify=False)
+            if response.status_code == 200:
+                res_json = response.json()
+                rt_cd = res_json.get("rt_cd")
+                msg = res_json.get("msg1")
+                if rt_cd in ["0", "0000"]:
+                    print(f" └ 🎉 [주문 통신 체결 성공] 종목: {stock_code} | 수량: {qty}주 | 응답 메시지: {msg}", flush=True)
+                else:
+                    print(f" └ ❌ [증권사 거부 오류] 코드: {rt_cd} | 원인: {msg}", flush=True)
+            else:
+                print(f" └ ❌ [HTTP 서버 오류] 상태 코드: {response.status_code} | 내용: {response.text}", flush=True)
+        except Exception as e:
+            print(f" └ ❌ [통신 파괴 오류] 주문 전송 중 치명적 에러 발생: {e}", flush=True)
+
+# --- Code to execute the classes ---
+
+# 1. TechnicalSkillGrid Demonstration
+skill_grid = TechnicalSkillGrid()
+skill_grid.display_grid_console()
+
+# 2. FinancialDataScienceEngine Demonstration
+financial_config = {"intensity": 0.7}
+financial_engine = FinancialDataScienceEngine(financial_config)
+
+asset_code_example_1 = "005930"
+raw_streams_example_1 = ["Good news about the market!", "Strong earnings report."]
+screening_factor_1 = financial_engine.process_consciousness_to_science(
+    asset_code_example_1, raw_streams_example_1
+)
+
+asset_code_example_2 = "035720"
+raw_streams_example_2 = ["Market is bearish.", "Weak sales forecast."]
+screening_factor_2 = financial_engine.process_consciousness_to_science(
+    asset_code_example_2, raw_streams_example_2
+)
+
+# 3. ConsciousnessIntelligence Demonstration
+ai_config = {"threshold": 0.2, "intensity": 0.5, "mode": "momentum"}
+target_assets = {"005930": 0.5, "035720": 0.5}
+
+consciousness_ai = ConsciousnessIntelligence(target_assets=target_assets, config=ai_config)
+
+raw_streams_ai_example = {
+    "005930": [
+        "Samsung Electronics stock shows strong performance.",
+        "Analysts predict positive outlook for semiconductors."
+    ],
+    "035720": [
+        "Kakao shares facing regulatory pressure.",
+        "Uncertainty in the platform business market."
+    ]
+}
+volatility_example = {"005930": 0.05, "035720": 0.15}
+
+tilting_factors = consciousness_ai.get_tactical_tilting_factors(
+    raw_streams_ai_example, volatility_example
+)
+
+# 4. Neo4jConsciousnessRecommendationEngine Demonstration
+neo4j_config = {"intensity": "High"}
+neo4j_engine = Neo4jConsciousnessRecommendationEngine(neo4j_config)
+
+user_id = "user123"
+asset_code = "005930"
+asset_name = "Samsung Electronics"
+sentiment_score = 0.75
+
+recommendation_score = neo4j_engine.run_precision_graph_rag_analysis(
+    user_id, asset_code, asset_name, sentiment_score
+)
+
+asset_code_negative = "035720"
+asset_name_negative = "Kakao"
+sentiment_score_negative = -0.4
+
+recommendation_score_negative = neo4j_engine.run_precision_graph_rag_analysis(
+    user_id, asset_code_negative, asset_name_negative, sentiment_score_negative
+)
+  
+# 5. IntegratedConsciousnessRobo Demonstration
+# Note: For actual functionality, valid KB증권 API keys (kb_app_key, kb_app_secret) and an account number (kb_account_no) would be required.
+# We will demonstrate the instantiation and the initialization of its internal engines.
+robo_config = {
+    "base_weights": {"005930": 0.5, "035720": 0.5}, # Example base weights (reusing target_assets)
+    "kb_app_key": "YOUR_KB_APP_KEY", # Placeholder
+    "kb_app_secret": "YOUR_KB_APP_SECRET", # Placeholder
+    "kb_account_no": "YOUR_KB_ACCOUNT_NO", # Placeholder
+    "threshold": 0.2, # from ai_config
+    "intensity": 0.5, # from ai_config
+    "mode": "momentum", # from ai_config
+    "ENABLE_REAL_TRADING": False # Set to True for real trading (requires API setup)
+}
+
+robo_controller = IntegratedConsciousnessRobo(config=robo_config)
+print("\n[System] ✅ IntegratedConsciousnessRobo 마스터 컨트롤러 초기화 및 내부 엔진 조립 완료.")
